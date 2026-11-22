@@ -9,19 +9,34 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+
   rabbitmq:
     image: rabbitmq:3-management
     environment:
       RABBITMQ_DEFAULT_USER: shop
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
     ports: ["5672:5672", "15672:15672"]
+
   redis:
     image: redis:7
     ports: ["6379:6379"]
+
+  traefik:
+    image: traefik:v3.0
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports: ["80:80", "8080:8080"]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
   jaeger:
     image: jaegertracing/all-in-one:latest
     environment:
       COLLECTOR_OTLP_ENABLED: "true"
     ports: ["16686:16686", "4317:4317", "4318:4318"]
+
 volumes:
   pgdata:
