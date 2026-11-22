@@ -18,6 +18,11 @@ export class AuthController {
     return this.auth.login(dto.email, dto.password);
   }
 
+  @Post('auth/refresh')
+  refresh(@Body('refreshToken') refreshToken: string) {
+    return this.auth.refresh(refreshToken);
+  }
+
   @Get('.well-known/jwks.json')
   jwks() {
     const jwk = createPublicKey(readFileSync('keys/public.pem')).export({ format: 'jwk' });
